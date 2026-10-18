@@ -1,12 +1,12 @@
 import java.util.Scanner;
-
 public class ConfiguracionInicialDeLaSala {
 
     private final Scanner sc = new Scanner(System.in);
-
     private int filas;
     private int columnas;
     private String[][] asientos;   // identificadores en memoria (A1, A2, ... B1, B2, ...)
+    //ver si el asiento esta disponible o no
+    private boolean[][] ocupados;
 
     // Método que se llama desde el main
     public void iniciar() {
@@ -19,8 +19,28 @@ public class ConfiguracionInicialDeLaSala {
         // 2. Generar los identificadores automáticamente
         generarAsientos();
 
+        //cuando la sala se crea todos los asientos estan libres al inicio
+        ocupados = new boolean[filas][columnas];
+
         // 3. Mostrar la sala
         mostrarSala();
+
+        //Menu
+        int opcion = 0;
+        while(opcion !=3) {
+            System.out.println("=========== Menú de JoPo Cine ===========");
+            System.out.println("1. Seleccionar asientos");
+            System.out.println("2. Sala");
+            System.out.println("3. Salir de JoPo Cine");
+            opcion = pedirNumero("Elija una opción: ", 3, "Opción inválida. Elija 1, 2 o 3.");
+
+            if (opcion == 1) {
+                seleccionarAsiento();
+            } else if (opcion == 2) {
+                mostrarSala();
+            }
+            System.out.println("¡Vuelve pronto a JoPo!");
+        }
     }
 
     // Pide un entero entre 1 y max. Si es inválido, muestra el error y vuelve a pedir.
@@ -51,6 +71,20 @@ public class ConfiguracionInicialDeLaSala {
         }
     }
 
+    private int pedirFila() {
+        char ultima = (char) ('A' + filas - 1);
+        while (true) {
+            System.out.print(
+                    "¿En qué fila desea estar? (A-" + ultima + "): "
+            );
+            String entrada = sc.nextLine().trim().toUpperCase();
+            if (entrada.length() == 1 && entrada.charAt(0) >= 'A' && entrada.charAt(0) <= ultima) {
+                return entrada.charAt(0) - 'A';
+            }
+            System.out.println("Fila inválida. Ingrese una letra entre A y " + ultima );
+        }
+    }
+
     // Dibuja la sala: pantalla arriba, filas con letra y asientos numerados
     private void mostrarSala() {
         int ancho = columnas * 5 + 8;
@@ -67,9 +101,46 @@ public class ConfiguracionInicialDeLaSala {
             System.out.print(letra + "   ");
             // El asiento 1 queda a la derecha, igual que en la imagen
             for (int numero = columnas; numero >= 1; numero--) {
-                System.out.print(String.format("[%2d]", numero) + " ");
+                if (ocupados[i][numero - 1]) {
+                    System.out.print("[X] ");
+                } else {
+                    System.out.printf("[%2d] ", numero);
+                }
             }
             System.out.println("  " + letra);
         }
+    }
+
+    private void seleccionarAsiento() {
+        if (salaLlena()) {
+            System.out.println("La sala está llena, no quedan asientos disponibles.");
+            return;
+        }
+        mostrarSala();
+        System.out.println();
+        while (true) {
+            int fila = pedirFila();
+            int numero = pedirNumero("¿En qué asiento desea estar? (1-" + columnas + "): ", columnas,
+                    "Asiento inválido. Ingrese un número entre 1 y " + columnas + ".");
+            char letra = (char) ('A' + fila);
+            if (ocupados[fila][numero - 1]) {
+                System.out.println("El asiento " + letra + numero + " ya está ocupado. Elija otro.\n");
+            } else {
+                ocupados[fila][numero - 1] = true;
+                System.out.println("\n¡Asiento " + letra + numero + " seleccionado con éxito!");
+                mostrarSala();
+                return;   // regresa al menú}
+            }
+        }
+    }
+    private boolean salaLlena() {
+        for(int i = 0; i < filas; i++) {
+            for(int j = 0; j < columnas; j++) {
+                if(!ocupados[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
