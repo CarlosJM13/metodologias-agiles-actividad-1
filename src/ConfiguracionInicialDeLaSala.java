@@ -1,6 +1,11 @@
 import java.util.Scanner;
 public class ConfiguracionInicialDeLaSala {
 
+    // Colores para la consola
+    private static final String ROJO = "\u001B[31m";
+    private static final String VERDE = "\u001B[32m";
+    private static final String RESET = "\u001B[0m";
+
     private final Scanner sc = new Scanner(System.in);
     private int filas;
     private int columnas;
@@ -8,7 +13,7 @@ public class ConfiguracionInicialDeLaSala {
     //ver si el asiento esta disponible o no
     private boolean[][] ocupados;
 
-    // Método que se llama desde el main
+    // Metodo que se llama desde el main
     public void iniciar() {
         // 1. Pedir el tamaño de la sala (con validación)
         filas = pedirNumero("¿Cuántas filas tendrá la sala? (máximo 26): ", 26,
@@ -39,7 +44,7 @@ public class ConfiguracionInicialDeLaSala {
             } else if (opcion == 2) {
                 mostrarSala();
             }
-            System.out.println("¡Vuelve pronto a JoPo!");
+            System.out.println("¡Vuelve pronto a JoPo's Juan cinema!");
         }
     }
 
@@ -99,16 +104,21 @@ public class ConfiguracionInicialDeLaSala {
         for (int i = 0; i < filas; i++) {
             char letra = (char) ('A' + i);
             System.out.print(letra + "   ");
-            // El asiento 1 queda a la derecha, igual que en la imagen
+
+            // El asiento 1 queda a la derecha
             for (int numero = columnas; numero >= 1; numero--) {
-                if (ocupados[i][numero - 1]) {
-                    System.out.print("[X] ");
-                } else {
-                    System.out.printf("[%2d] ", numero);
-                }
+                boolean estaOcupado = ocupados[i][numero - 1];
+                String color = estaOcupado ? ROJO  : VERDE;
+
+                // Si el asiento está ocupado, ponemos x, de lo contrario, ponemos el número
+                String textoAsiento = estaOcupado ? "[ X]" : String.format("[%2d]", numero);
+
+                System.out.print(color + textoAsiento + RESET + " ");
             }
             System.out.println("  " + letra);
         }
+
+        System.out.println("\n" + VERDE + "Verde = libre" + RESET + "   " + ROJO + "Rojo = ocupado (X)" + RESET);
     }
 
     private void seleccionarAsiento() {
