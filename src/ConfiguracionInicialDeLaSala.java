@@ -44,7 +44,7 @@ public class ConfiguracionInicialDeLaSala {
             } else if (opcion == 2) {
                 mostrarSala();
             }
-            System.out.println("¡Vuelve pronto a JoPo & Juan cinema!");
+            System.out.println("¡Vuelve pronto a JoPo's Juan cinema!");
         }
     }
 
