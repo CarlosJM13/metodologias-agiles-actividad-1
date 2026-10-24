@@ -45,4 +45,16 @@ public class Sala {
         }
         return true;
     }
+    //JPC 28
+    public int cantidadAsientosLibres() {
+        int disponibles = 0;
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                if (!asientos[i][j].isOcupado()) {
+                    disponibles++;
+                }
+            }
+        }
+        return disponibles;
+    }
 }

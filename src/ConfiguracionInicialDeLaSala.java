@@ -1,4 +1,6 @@
 // Coordina el programa y pide el tamaño de la sala y muestra el menú y gestiona la selección de asientos
+import java.util.ArrayList;
+import java.util.List;
 public class ConfiguracionInicialDeLaSala {
 
     private final LectorConsola lector = new LectorConsola();
@@ -40,26 +42,55 @@ public class ConfiguracionInicialDeLaSala {
             System.out.println("La sala está llena, no quedan asientos disponibles.");
             return;
         }
+        int disponibles = sala.cantidadAsientosLibres();
 
         vista.mostrarSala(sala);
-        System.out.println();
+        System.out.println("Asientos disponibles: " + disponibles);
+        System.out.println("Escriba 0 para cancelar.");
 
-        while (true) {
-            int fila = lector.pedirFila(sala.getFilas());
-            int numero = lector.pedirNumero("¿En qué asiento desea estar? (1-" + sala.getColumnas() + "): ",
-                    sala.getColumnas(),
-                    "Asiento inválido. Ingrese un número entre 1 y " + sala.getColumnas() + ".");
+        int cantidad = lector.pedirNumeroCancelable("¿Cuántos asientos desea comprar?: ", disponibles, "Cantidad inválida. Ingrese una cantidad entre 1 y " + disponibles + ".");
+        if (cantidad == 0) {
+            System.out.println("Compra cancelada.");
+            return;
+        }
 
-            Asiento asiento = sala.buscarAsiento(fila, numero);
+        List<Asiento> seleccionados = new ArrayList<>();
 
-            if (asiento.isOcupado()) {
-                System.out.println("El asiento " + asiento.getId() + " ya está ocupado. Elija otro.\n");
-            } else {
-                asiento.setOcupado(true);
-                System.out.println("\n¡Asiento " + asiento.getId() + " seleccionado con éxito!");
-                vista.mostrarSala(sala);
-                return;   // regresa al menú
+        for (int i = 0; i < cantidad; i++) {
+            while (true) {
+                System.out.println("\nSeleccione el asiento " + (i + 1) + " de " + cantidad);
+                int fila = lector.pedirFilaCancelable(sala.getFilas());
+                if (fila == -1) {
+                    System.out.println("Compra cancelada. No se reservó ningún asiento.");
+                    return;
+                }
+
+                int numero = lector.pedirNumeroCancelable("Número de asiento (0 para cancelar): ", sala.getColumnas(), "Número inválido. Ingrese un número entre 1 y " + sala.getColumnas() + ".");
+                if (numero == 0) {
+                    System.out.println("Compra cancelada. No se reservó ningún asiento.");
+                    return;
+                }
+
+                Asiento asiento = sala.buscarAsiento(fila, numero);
+                if (asiento.isOcupado()) {
+                    System.out.println("El asiento " + asiento.getId() + " ya está ocupado. Elija otro.");
+                } else if (seleccionados.contains(asiento)) {
+                    System.out.println("El asiento " + asiento.getId() + " ya fue seleccionado. Elija otro.");
+                } else {
+                    seleccionados.add(asiento);
+                    System.out.println("Asiento " + asiento.getId() + " seleccionado.");
+                    break;
+                }
             }
         }
+
+// Marcar los asientos seleccionados como ocupados
+        for (Asiento asiento : seleccionados) {
+            asiento.setOcupado(true);
+        }
+        for (Asiento asiento : seleccionados) {
+            System.out.println("Asiento reservado: " + asiento.getId());
+        }
+        vista.mostrarSala(sala);
     }
 }
